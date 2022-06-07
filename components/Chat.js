@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Button, StyleSheet } from "react-native";
+import { View } from "react-native";
 
 // The application’s main Chat component that renders the chat UI export default
 export default class Chat extends React.Component {
