@@ -1,7 +1,7 @@
 import React from "react";
 //import the gifted chat
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import { View, Platform, KeyboardAvoidingView } from "react-native";
+import { View, Platform, KeyboardAvoidingView, StyleSheet } from "react-native";
 
 // The application’s main Chat component that renders the chat UI export default
 export default class Chat extends React.Component {
@@ -46,26 +46,7 @@ export default class Chat extends React.Component {
     return (
       <Bubble
         {...props}
-        wrapperStyle={{
-          left: {
-            backgroundColor: "#4F94CD", borderColor: "black", borderWidth: 0.15,     shadowColor: "#000000",
-            shadowOpacity: 0.8,
-            shadowRadius: 2,
-            shadowOffset: {
-              height: 1,
-              width: 1
-            }
-          },
-          right: {
-            backgroundColor: "#90EE90", borderColor: "black", borderWidth: 0.15,     shadowColor: "#000000",
-            shadowOpacity: 0.8,
-            shadowRadius: 2,
-            shadowOffset: {
-              height: 1,
-              width: 1
-            }
-          },
-        }}
+        wrapperStyle={bubbleStyles}
       />
     );
   }
@@ -103,11 +84,17 @@ export default class Chat extends React.Component {
 
 
 
-const styles = StyleSheet.create({
-  chatBubbleLeft: {
-    flex: 1,
+const bubbleStyles = StyleSheet.create({
+  left: {
+    backgroundColor: "#4F94CD", borderColor: "black", borderWidth: 0.15,     shadowColor: "#000000",
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1
+    }
   },
-  chatBubbleRight: {
+  right: {
     backgroundColor: "#90EE90", borderColor: "black", borderWidth: 0.15,     shadowColor: "#000000",
     shadowOpacity: 0.8,
     shadowRadius: 2,
