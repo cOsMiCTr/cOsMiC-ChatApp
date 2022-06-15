@@ -53,7 +53,7 @@ export default class Chat extends React.Component {
         messages: [],
         user: {
           _id: user.uid,
-          name: name,
+          name: user.name,
           avatar: "https://placeimg.com/140/140/any",
       },
       });
@@ -97,9 +97,7 @@ export default class Chat extends React.Component {
         .orderBy("createdAt", "desc");
   }
 
-  componentWillUnmount() {
-    this.authUnsubscribe();
-  }
+
 
 
   
@@ -107,8 +105,11 @@ export default class Chat extends React.Component {
   onSend(messages = []) {
     this.setState((previousState) => ({
       messages: GiftedChat.append(previousState.messages, messages),
-    }))
+    }));() => {
+      addMessages();}
   }
+
+
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
@@ -128,9 +129,6 @@ export default class Chat extends React.Component {
         image: data.image || null,
         location: data.location || null,
       });
-    });
-    this.setState({
-      messages: messages,
     });
   };
 
@@ -153,7 +151,9 @@ export default class Chat extends React.Component {
     });
 
   }
-
+  componentWillUnmount() {
+    this.authUnsubscribe();
+  }
   render() {
     //get name
     let name = this.props.route.params.name;
@@ -161,6 +161,8 @@ export default class Chat extends React.Component {
     let { bgColor } = this.props.route.params;
     //Set name to navbar
     this.props.navigation.setOptions({ title: name });
+
+    this.referenceChatMessages = firebase.firestore().collection("messages");
 
     return (
       <View
