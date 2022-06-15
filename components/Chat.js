@@ -98,11 +98,11 @@ export default class Chat extends React.Component {
   }
 
   componentWillUnmount() {
-    this.unsubscribeListUser();
     this.authUnsubscribe();
-    this.unsubscribe();
-
   }
+
+
+  
   //Send Message
   onSend(messages = []) {
     this.setState((previousState) => ({
@@ -182,6 +182,7 @@ export default class Chat extends React.Component {
         {Platform.OS === "android" ? (
           <KeyboardAvoidingView behavior="height" />
         ) : null}
+        
       </View>
     );
   }
