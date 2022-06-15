@@ -25,12 +25,11 @@ export default class Chat extends React.Component {
     super(props);
     this.state = {
       messages: [],
-      uid: 1,
+      uid: "",
       user: {
         _id: "",
         name: "",
       },
-      isConnected: false,
       image: null,
       location: null,
     };
@@ -62,13 +61,13 @@ export default class Chat extends React.Component {
       }
       this.setState({
         uid: user.uid,
+        messages: [],
         user: {
           _id: user.uid,
           name: name,
-        },
-        messages: [],
+          avatar: "https://placeimg.com/140/140/any",
+      },
       });
-
       this.unsubscribeChatUser = this.referenceChatMessages
         .orderBy("createdAt", "desc")
         .onSnapshot(this.onCollectionUpdate);
@@ -95,8 +94,9 @@ export default class Chat extends React.Component {
     //   ],
     // });
 
-    this.referenceMessages = firebase.firestore().collection("messages");
-    this.unsubscribe = this.referenceChatMessages.orderBy("createdAt", "desc");
+    // this.referenceMessages = firebase.firestore().collection("messages").where('user_id','==',user.uid);
+
+    // this.unsubscribe = this.referenceChatMessages.orderBy("createdAt", "desc");
   }
 
   //Send Message
@@ -153,7 +153,12 @@ export default class Chat extends React.Component {
   componentWillUnmount() {
     // Stops listening for changes
     this.authUnsubscribe();
+    // Stops listening for authentication
+    // this.unsubscribeChatUser();
   }
+
+
+
   render() {
     //get name
     let name = this.props.route.params.name;
@@ -163,7 +168,7 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: name });
 
     this.referenceChatMessages = firebase.firestore().collection("messages");
-    const { messages, user } = this.state;
+    const { user } = this.state;
     return (
       <View
         style={{
