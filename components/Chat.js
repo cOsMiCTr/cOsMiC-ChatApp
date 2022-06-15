@@ -1,24 +1,38 @@
 import React from "react";
 //import the gifted chat
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import { View, Platform, KeyboardAvoidingView, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Platform,
+  KeyboardAvoidingView,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 import { initializeApp } from "firebase/app";
-import { collection, onSnapshot, addDoc, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
 const firebase = require("firebase");
 require("firebase/firestore");
 
 // The application’s main Chat component that renders the chat UI export default
 export default class Chat extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       messages: [],
-      uid: '',
+      uid: 1,
       user: {
         _id: "",
         name: "",
-        avatar: "https://placeimg.com/140/140/any",
       },
+      isConnected: false,
+      image: null,
+      location: null,
     };
 
     // Initialize Firebase
@@ -36,13 +50,11 @@ export default class Chat extends React.Component {
     //Stores and retrieves the chat messages users send
     this.referenceChatMessages = firebase.firestore().collection("messages");
 
-    this.referenceMessagesUser= null;
+    this.referenceMessagesUser = null;
   }
 
   componentDidMount() {
-
-    this.referenceMessages = firebase.firestore().collection('messages');
-
+    this.referenceMessages = firebase.firestore().collection("messages");
 
     this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
@@ -50,23 +62,16 @@ export default class Chat extends React.Component {
       }
       this.setState({
         uid: user.uid,
-        messages: [],
         user: {
           _id: user.uid,
-          name: user.name,
-          avatar: "https://placeimg.com/140/140/any",
-      },
+          name: name,
+        },
+        messages: [],
       });
 
-      this.referenceMessagesUser = firebase
-      .firestore()
-      .collection("messages")
-      .where('uid', "==", this.state.uid);
-    // listen for collection changes for current user
-    this.unsubscribeListUser = this.referenceChatMessages.onSnapshot(
-      this.onCollectionUpdate
-    );
-    
+      this.unsubscribeChatUser = this.referenceChatMessages
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
     });
 
     // this.setState({
@@ -90,33 +95,28 @@ export default class Chat extends React.Component {
     //   ],
     // });
 
-    this.referenceMessages = firebase
-      .firestore()
-      .collection("messages");
-      this.unsubscribe = this.referenceChatMessages
-        .orderBy("createdAt", "desc");
+    this.referenceMessages = firebase.firestore().collection("messages");
+    this.unsubscribe = this.referenceChatMessages.orderBy("createdAt", "desc");
   }
 
-
-
-
-  
   //Send Message
   onSend(messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));() => {
-      addMessages();}
+    this.setState(
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }),
+      () => {
+        this.addMessages();
+      }
+    );
   }
-
-
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // go through each document
     querySnapshot.forEach((doc) => {
       // get the QueryDocumentSnapshot's data
-      var data = doc.data();
+      let data = doc.data();
       messages.push({
         _id: data._id,
         text: data.text,
@@ -124,34 +124,34 @@ export default class Chat extends React.Component {
         user: {
           _id: data.user._id,
           name: data.user.name,
-          avatar: data.user.avatar
         },
         image: data.image || null,
         location: data.location || null,
       });
     });
+    this.setState({ messages });
   };
 
   renderBubble(props) {
     return <Bubble {...props} wrapperStyle={bubbleStyles} />;
   }
 
-
   // push typed message to db
   addMessages() {
-    const message = this.state.messages[0];
+    const messages = this.state.messages[0];
     this.referenceChatMessages.add({
+      _id: messages._id,
+      text: messages.text || "",
       uid: this.state.uid,
-      _id: message._id,
-      text: message.text || "",
-      createdAt: message.createdAt,
-      user: message.user,
-      image: message.image || null,
-      location: message.location || null,
+      createdAt: messages.createdAt,
+      user: messages.user,
+      image: messages.image || null,
+      location: messages.location || null,
     });
-
   }
+
   componentWillUnmount() {
+    // Stops listening for changes
     this.authUnsubscribe();
   }
   render() {
@@ -163,7 +163,7 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: name });
 
     this.referenceChatMessages = firebase.firestore().collection("messages");
-
+    const { messages, user } = this.state;
     return (
       <View
         style={{
@@ -175,16 +175,11 @@ export default class Chat extends React.Component {
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
-          user={{
-            _id: this.state.user._id,
-            name: name,
-            avatar: this.state.user.avatar 
-          }}
+          user={user}
         />
         {Platform.OS === "android" ? (
           <KeyboardAvoidingView behavior="height" />
         ) : null}
-        
       </View>
     );
   }
