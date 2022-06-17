@@ -38,6 +38,7 @@ export default class Start extends React.Component {
   };
 
   render() {
+    const name = this.state.name;
     return (
       <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -60,7 +61,7 @@ export default class Start extends React.Component {
             <View style={styles.inputBox}>
               <TextInput
                 style={styles.input}
-                onChangeText={(text) => this.setState({ name: text })}
+                onChangeText={(name) => this.setState({ name })}
                 value={this.state.name}
                 placeholder="Enter your name..."
               />
