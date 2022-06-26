@@ -10,8 +10,11 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 
-const firebase = require("firebase");
-require("firebase/firestore");
+import CustomActions from "./CustomActions";
+import "firebase/firestore";
+import firebase from "firebase";
+
+
 
 // The application’s main Chat component that renders the chat UI export default
 export default class Chat extends React.Component {
@@ -27,7 +30,7 @@ export default class Chat extends React.Component {
         avatar: ""
       },
       image: null,
-      ocation: null
+      location: null
     };
 
     // Initialize Firebase
@@ -196,6 +199,32 @@ export default class Chat extends React.Component {
     }
   }
 
+  renderCustomView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{
+            width: 150,
+            height: 100,
+            borderRadius: 13,
+            margin: 3
+          }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  }
+  
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
 
   componentWillUnMount() {
     //stop listening for changes
@@ -206,6 +235,8 @@ export default class Chat extends React.Component {
 
 
   render() {
+
+
 
     //get selected color
     let { bgColor } = this.props.route.params;
@@ -219,16 +250,17 @@ export default class Chat extends React.Component {
           flex: 1,
         }}
       >
-        <GiftedChat
-          rendeBubble={this.renderBubble.bind(this)}
+
+<GiftedChat
+          renderBubble={this.renderBubble.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
-          messages={this.state.messages}
-          onSend={(messages) => this.onSend(messages)}
           renderActions={this.renderCustomActions}
           renderCustomView={this.renderCustomView}
+          messages={this.state.messages}
+          onSend={messages => this.onSend(messages)}
           user={{
             _id: this.state.user._id,
-            name: this.state.name,
+            username: this.state.username,
             avatar: this.state.user.avatar
           }}
         />
