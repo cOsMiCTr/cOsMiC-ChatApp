@@ -120,18 +120,17 @@ export default class CustomActions extends React.Component {
 
   render() {
     return (
-
-        <TouchableOpacity
-          style={[styles.container]}
-          onPress={this.onActionPress}
-          accessibilityLabel="More options"
-          accessibilityHint="Choose to send an image, audio or your geolocation."
-        >
-          <View style={[styles.wrapper, this.props.wrapperStyle]}>
-            <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
-          </View>
-        </TouchableOpacity>
-
+      <TouchableOpacity
+        accessible={true}
+        style={[styles.container]}
+        onPress={this.onActionPress}
+        accessibilityLabel="More options"
+        accessibilityHint="Choose to send an image, audio or your geolocation."
+      >
+        <View style={[styles.wrapper, this.props.wrapperStyle]}>
+          <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 }
